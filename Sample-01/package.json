@@ -12,7 +12,8 @@
     "server:dev": "nodemon server.js",
     "api-server": "node api-server.js",
     "api-server:dev": "nodemon api-server.js",
-    "dev": "npm-run-all --parallel spa api-server:dev",
+    "own-api-server:dev": "nodemon own-api-server.js",
+    "dev": "npm-run-all --parallel spa api-server:dev own-api-server:dev",
     "prod": "npm-run-all --parallel server api-server"
   },
   "dependencies": {
@@ -23,7 +24,9 @@
     "@fortawesome/fontawesome-svg-core": "^1.2",
     "@fortawesome/free-solid-svg-icons": "^5.8",
     "@fortawesome/react-fontawesome": "^0.2",
+    "auth0": "^3.5.0",
     "autoprefixer": "^10.4",
+    "axios": "^1.4.0",
     "cors": "^2.8",
     "express": "^4.18",
     "express-oauth2-jwt-bearer": "^1.5.0",
@@ -37,14 +40,17 @@
     "react-router-dom": "^5.3",
     "react-scripts": "^5.0",
     "reactstrap": "^9.2",
+    "request": "^2.88.2",
     "typescript": "^4.9"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16",
     "@testing-library/react": "^14.0",
+    "daisyui": "^3.1.6",
     "jest-environment-jsdom": "^27.0",
     "jest-fetch-mock": "^3.0",
-    "nodemon": "^2.0"
+    "nodemon": "^2.0",
+    "tailwindcss": "^3.3.2"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -65,7 +65,7 @@ export const ExternalApiComponent = () => {
       });
 
       const responseData = await response.json();
-
+      
       setState({
         ...state,
         showResult: true,
@@ -77,6 +77,7 @@ export const ExternalApiComponent = () => {
         error: error.error,
       });
     }
+    // console.log("state: ", state)
   };
 
   const handle = (e, fn) => {
