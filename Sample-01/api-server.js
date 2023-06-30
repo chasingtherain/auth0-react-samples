@@ -11,17 +11,25 @@ const port = process.env.API_PORT || 3001;
 const appPort = process.env.SERVER_PORT || 3000;
 const appOrigin = authConfig.appOrigin || `http://localhost:${appPort}`;
 
+require('dotenv').config();
 
 var request = require("request");
 let token = null
+const mgtApiClientId = process.env.REACT_APP_MANAGEMENT_API_CLIENT_ID;
+const mgtApiClientSecret = process.env.REACT_APP_MANAGEMENT_API_CLIENT_SECRET;
+
+// Get access token for management API
 var options = { method: 'POST',
   url: 'https://dev-zwmgj06ga0j7dtc5.us.auth0.com/oauth/token',
   headers: { 'content-type': 'application/json' },
-  body: '{"client_id":"qUdhoqD4lyHTh3U10em7MR6Biji1C4Nk","client_secret":"8bnJD9P25UGRnuGeWpits5Vn2scHHhpHqv3r-GoXNUUUEs5CDGiFOwM24NfCO7ZL","audience":"https://dev-zwmgj06ga0j7dtc5.us.auth0.com/api/v2/","grant_type":"client_credentials"}' };
+  body: `{"client_id":"${mgtApiClientId}","client_secret":"${mgtApiClientSecret}","audience":"https://dev-zwmgj06ga0j7dtc5.us.auth0.com/api/v2/","grant_type":"client_credentials"}` 
+
+};
 
 request(options, function (error, response, body) {
   if (error) throw new Error(error);
   
+  // save mgt API access token, to be referenced in routes below
   token = JSON.parse(body).access_token
 });
 
