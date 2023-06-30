@@ -31,7 +31,7 @@ let token = null
 const reportApiClientId = process.env.REACT_APP_REPORT_API_CLIENT_ID;
 const reportApiClientSecret = process.env.REACT_APP_REPORT_API_CLIENT_SECRET;
 
-console.log(process.env)
+// Get access token for report API via M2M app
 var options = { method: 'POST',
   url: 'https://dev-zwmgj06ga0j7dtc5.us.auth0.com/oauth/token',
   headers: { 'content-type': 'application/json' },

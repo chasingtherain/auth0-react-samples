@@ -18,7 +18,10 @@ let token = null
 const mgtApiClientId = process.env.REACT_APP_MANAGEMENT_API_CLIENT_ID;
 const mgtApiClientSecret = process.env.REACT_APP_MANAGEMENT_API_CLIENT_SECRET;
 
-// Get access token for management API
+const reportApiClientId = process.env.REACT_APP_REPORT_API_CLIENT_ID;
+const reportApiClientSecret = process.env.REACT_APP_REPORT_API_CLIENT_SECRET;
+
+// Get access token for management API via M2M app
 var options = { method: 'POST',
   url: 'https://dev-zwmgj06ga0j7dtc5.us.auth0.com/oauth/token',
   headers: { 'content-type': 'application/json' },
@@ -67,6 +70,7 @@ app.get("/api/external", checkJwt, (req, res) => {
   });
 });
 
+// GET /api/v2/clients - Retrieve all clients in tenant
 app.get("/api/v2/clients", checkJwt, (req, res) => {
   
   let config = {
@@ -92,9 +96,11 @@ app.get("/api/v2/clients", checkJwt, (req, res) => {
 
 });
 
+// GET /api/user/permission - Retrieve specific user's permission
+// note: using POST to pass user_id from FE because I received 404 when passing valid {user_id} in /api/v2/users/{user_id}/permissions  
 app.post("/api/user/permission", checkJwt, (req, res) => {
-
   const user_id = req.body[0]
+
   let config = {
     method: 'get',
     url: `https://dev-zwmgj06ga0j7dtc5.us.auth0.com/api/v2/users/${user_id}/permissions`,
@@ -118,6 +124,7 @@ app.post("/api/user/permission", checkJwt, (req, res) => {
 
 });
 
+// GET /api/v2/actions/actions?deployed=true - Retrieve all deployed actions in tenant
 app.get("/api/v2/actions/actions", checkJwt, (req, res) => {
   
   let config = {
@@ -143,12 +150,13 @@ app.get("/api/v2/actions/actions", checkJwt, (req, res) => {
 
 });
 
+// GET /get-report-api-token - Retrieve report API's token
 app.get('/get-report-api-token', function (req, res) {
 
   var options = { method: 'POST',
   url: 'https://dev-zwmgj06ga0j7dtc5.us.auth0.com/oauth/token',
   headers: { 'content-type': 'application/json' },
-  body: '{"client_id":"T0tO4mQPnnN9xn6TrUYgrnh3adtSDW1n","client_secret":"7-PP2SZVMAMsVvWhnM9OwzkLHUVyBGhoFHfJlCD2znREF2c0KIPjQDvKIwV8sGsq","audience":"http://localhost:8080/api/v2/","grant_type":"client_credentials"}' };
+  body: `{"client_id":"${reportApiClientId}","client_secret":"${reportApiClientSecret}","audience":"http://localhost:8080/api/v2/","grant_type":"client_credentials"}` };
 
   request(options, function (error, response, body) {
   if (error) throw new Error(error);
