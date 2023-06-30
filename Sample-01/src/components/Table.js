@@ -1,14 +1,12 @@
 import React from 'react'
 
 function Table({actionsList, allClients}) {
-// console.log("actionsList from table: ", actionsList)
-// console.log("allClients from table: ", allClients)
 
+// Identify Actions used by each app
 const actionsUsedByApp = allClients
                             ?.map(client => actionsList
                             ?.filter(action => action.usedBy.includes(client)))
 
-// console.log("actionsUsedByApp: ", actionsUsedByApp)
   return (
         <div className="overflow-x-auto">
         <table className="table mb-5">
@@ -22,7 +20,7 @@ const actionsUsedByApp = allClients
             </tr>
             </thead>
             <tbody>
-            {actionsList.length == 0 && <p>loading...</p>}
+            {actionsList.length === 0 && <p>loading...</p>}
             {
                 actionsList?.map((action, index) => (
                     <tr className='hover:bg-slate-50'>
@@ -37,7 +35,6 @@ const actionsUsedByApp = allClients
         </table>
 
         <table className="table">
-            {/* head */}
             <thead>
             <tr className='text-black'>
                 <th></th>
@@ -46,7 +43,7 @@ const actionsUsedByApp = allClients
             </tr>
             </thead>
             <tbody>
-            {allClients.length == 0 && <p>loading...</p>}
+            {allClients.length === 0 && <p>loading...</p>}
             {
                 allClients?.map((client, index) => (
                     <tr className='hover:bg-slate-50'>

@@ -11,14 +11,12 @@ function ActionReportPage() {
     const history = useHistory();
     const [isManager, setIsManager] = useState(false)
     const [isFetching, setIsFetching] = useState(true)
-    
-    // console.log("user: ", user)
-    // const [deployedActions, setDeployedActions] = useState([])
     const [actionsList, setActionsList] = useState([])
     const [allClients, setAllClients] = useState([])
 
-    const { apiOrigin = "http://localhost:3001", audience } = getConfig();
+    const { apiOrigin = "http://localhost:3001" } = getConfig();
 
+    // retrieve all clients in tenant and returns client names when called
     const getClients = async () => {
         try {
             // get token
@@ -45,6 +43,7 @@ function ActionReportPage() {
           }
       };
 
+    // retrieve all Actions in tenant and returns a list of deployed Actions when called
     const getActions = async () => {
         try {
           console.log("getActions called");
@@ -62,11 +61,13 @@ function ActionReportPage() {
       
           const response = await axios(config);
           return response.data.result.actions
+
         } catch (error) {
           console.log(error);
         }
     };
-      
+
+    // retrieve specific user's permission when called
     const getUserPermission = async () => {
         try {
             const token = await getAccessTokenSilently();
@@ -91,6 +92,8 @@ function ActionReportPage() {
             return null;
           }
     };
+
+    // checks access to report by passing user's permission to server for validation
     const checkAccessToActionReport = async () => {
 
         const token = await getAccessTokenSilently();
@@ -103,14 +106,14 @@ function ActionReportPage() {
               'Authorization': `Bearer ${token}`
             }
           };
-        // console.log("original token", token)
+
         const retrieveReportApiTokenResponse = await axios(retrieveReportApiToken);
 
         const rawToken = JSON.parse(retrieveReportApiTokenResponse.data);
         const reportApiToken = rawToken.access_token
 
         const userPermission = await getUserPermission()
-        console.log("userPermission: ", userPermission)
+
         let config = {
           method: 'post',
           url: `http://localhost:8080/authorized`,
@@ -122,7 +125,6 @@ function ActionReportPage() {
         };
     
         const response = await axios(config);
-        console.log("own API resp: ", response.data);
 
         if(response.data.status === 200){
             // if user has access, call relevant api and display table to user
@@ -132,6 +134,8 @@ function ActionReportPage() {
         
     }
 
+    // Based on clients and actions in tenants, function returns an array of objects with: 
+    // action names, trigger bounded to actions and which app uses which action
 
     const getActionList = async () => {
         const clientList = await getClients()
@@ -139,59 +143,51 @@ function ActionReportPage() {
 
         const combinedClientAndActionList = []
 
-        // for each action, loop through all app and check if action applies to app
-        // 
+        // for each action, loop through app names and check if app utilised said action
         actions.forEach((action) => {
             const appList = []
             // if action.deployed_version.code is "", no code is provided and thus action is not used by any app
             if(action.deployed_version.code.length <= 0){
-                // console.log("action is not used by any app")
                 combinedClientAndActionList.push({
                     name: action.name,
                     triggers: action.supported_triggers,
-                    usedBy: []
+                    usedBy: [] // action not used by any app
                 })
             }
-            // if event.client.name is not referenced in Action, all apps are using it
+            // if code subfield is not empty and event.client.name is not referenced in Action, 
+            // then all apps are using it
             else if(!action.deployed_version.code.includes("event.client.name")){
                 combinedClientAndActionList.push({
                     name: action.name,
                     triggers: action.supported_triggers,
-                    usedBy: clientList
+                    usedBy: clientList // action used by all app
                 })
             }
-            // if code field has app name and conditional logic is applied to app and therefore, app is using action
+            // if code field is not empty and app name is found in code field,
+            // that means conditional logic is applied to app and therefore, app is using action
             else{
                 clientList.forEach((client) => {
                     if(action.deployed_version.code.includes(client)){
                         appList.push(client)
-                        // console.log("client name", client)
                     }
                 })
                 combinedClientAndActionList.push({
                     name: action.name,
                     triggers: action.supported_triggers,
-                    usedBy: appList
+                    usedBy: appList // action is used by some apps
                 })
             } 
         })
-        // console.log("combinedClientAndActionList: ", combinedClientAndActionList)
-
         setActionsList(combinedClientAndActionList)
         setAllClients(clientList)
     }
 
     useEffect(() => {
-        // Call your functions here
         const fetchData = async () => {
             try {
-              // Call your async functions in sequence
-                // await getUserPermission()
                 await checkAccessToActionReport()
                 setIsFetching(false)
-                // await getClients()
             } catch (error) {
-              // Handle any errors
                 setIsFetching(false)
                 console.log("useEffect error:", error)
             }
@@ -201,7 +197,6 @@ function ActionReportPage() {
 
         // Optional cleanup function
         return () => {
-          // Perform cleanup tasks here (if needed)
         };
       }, []);
 
@@ -215,21 +210,17 @@ function ActionReportPage() {
     
     if(!user) history.push('/')
     
-
+    // display Table UI if user is logged in and has manager role
     if(user && isManager){
-    // if(user && !isManager){
         return (
             <Table actionsList={actionsList} allClients={allClients}/>
         )
     }
-    console.log("isFetching: ", isFetching)
+
     return (
+        // if app is no longer fetching and user is not a manager, access will be denied
         isFetching ? <div>loading...</div> :
-        (user && !isManager) ? (
-          <div>
-            Access Denied
-          </div>
-        ) : null
+        (user && !isManager) ? (<div> Access Denied </div>) : null
       );
 }
 

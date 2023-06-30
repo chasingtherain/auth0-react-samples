@@ -42,13 +42,11 @@ request(options, function (error, response, body) {
 
 //   console.log(body);
 });
-
+// GET /authorized - Checks whether user has permission to access resource
 app.post('/authorized', function (req, res) {
     const permission = req.body.result
 
-    console.log("permission: ", permission)
-
-    // if arr is not empty, user has access
+    // if permission arr is not empty after filtering, user has access
     const authorizedUser = permission?.filter(item => item.permission_name === 'read:action-report')
     if (authorizedUser.length > 0){
         res.status(200).json({status:200, msg:'User has access to secured resource'});
